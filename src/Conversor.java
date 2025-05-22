@@ -1,6 +1,7 @@
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.annotations.SerializedName;
 
 import java.io.IOException;
 import java.net.URI;
@@ -8,7 +9,10 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-record ConversaoMoeda(String base_code, String target_code, double conversion_result) {}
+record ConversaoMoeda(@SerializedName("base_code") String moedaBase,
+                      @SerializedName("target_code") String moedaAlvo,
+                      @SerializedName("conversion_result") double resultado) {
+}
 
 public class Conversor {
     private static final String BRL = "BRL"; // real
@@ -20,6 +24,14 @@ public class Conversor {
 
     private Conversor() {}
 
+    public static ConversaoMoeda realParaDolar(double valorEmReal) {
+        return buscar(BRL, USD, valorEmReal);
+    }
+
+    public static ConversaoMoeda dolarParaReal(double valorEmDolar) {
+        return buscar(USD, BRL, valorEmDolar);
+    }
+
     public static ConversaoMoeda realParaEuro(double valorEmDolar) {
         return buscar(BRL, EUR, valorEmDolar);
     }
@@ -28,34 +40,26 @@ public class Conversor {
         return buscar(EUR, BRL, valorEmEuro);
     }
 
-    public static ConversaoMoeda dolarParaReal(double valorEmDolar) {
-        return buscar(USD, BRL, valorEmDolar);
+    public static ConversaoMoeda dolarParaEuro(double valorEmDolar) {
+        return buscar(USD, EUR, valorEmDolar);
     }
 
-    public static ConversaoMoeda dolarParaEuro(double valorDolar) {
-        return buscar(USD, EUR, valorDolar);
-    }
-
-    public static ConversaoMoeda euroParaDolar(double valorEuro) {
-        return buscar(EUR, USD, valorEuro);
-    }
-
-    public static ConversaoMoeda realParaDolar(double valorEmReal) {
-        return buscar(BRL, USD, valorEmReal);
-    }
-
-    public static ConversaoMoeda dolarParaPesoArgentino(double valorEmDolar) {
-        return buscar(USD, ARS, valorEmDolar);
+    public static ConversaoMoeda euroParaDolar(double valorEmEuro) {
+        return buscar(EUR, USD, valorEmEuro);
     }
 
     public static ConversaoMoeda pesoArgentinoParaDolar(double valorEmPesoArgentino) {
         return buscar(ARS, USD, valorEmPesoArgentino);
     }
 
-    private static ConversaoMoeda buscar(String base_code, String target_code, double valor) {
+    public static ConversaoMoeda dolarParaPesoArgentino(double valorEmDolar) {
+        return buscar(USD, ARS, valorEmDolar);
+    }
 
-        String url = String.format("https://v6.exchangerate-api.com/v6/%s/pair/%s/%s/%s",
-                                    API_KEY, base_code, target_code, valor);
+    private static ConversaoMoeda buscar(String codigoBase, String codigoAlvo, double valor) {
+
+        String url = "https://v6.exchangerate-api.com/v6/%s/pair/%s/%s/%s"
+                        .formatted(API_KEY, codigoBase, codigoAlvo, valor);
 
         try {
             HttpRequest request = HttpRequest

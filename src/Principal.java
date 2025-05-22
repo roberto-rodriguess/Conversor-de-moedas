@@ -44,17 +44,17 @@ public class Principal {
         }
     }
 
-    private static void exibirConversao(double valor, ConversaoMoeda valorConvertido) {
-        if (valorConvertido == null) {
+    private static void exibirConversao(double valor, ConversaoMoeda conversao) {
+        if (conversao == null) {
             System.out.println("Erro na conversão");
             return;
         }
 
         System.out.printf("O valor %,.2f [%s] corresponde ao valor de %,f [%s]%n%n",
                 valor,
-                valorConvertido.base_code(),
-                valorConvertido.conversion_result(),
-                valorConvertido.target_code()
+                conversao.moedaBase(),
+                conversao.resultado(),
+                conversao.moedaAlvo()
         );
     }
 
